@@ -1,29 +1,26 @@
-package com.ari.wishlist.application.service;
+package com.ari.wishlist.application.usecase;
 
 import com.ari.wishlist.application.dto.ProductDTO;
 import com.ari.wishlist.infrastructure.external.ProductClient;
 import com.ari.wishlist.infrastructure.external.exception.ProductNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ProductServiceUnitTest {
+class GetProductByIdUseCaseTest {
+
+    private static final String PRODUCT_NOT_FOUND_MESSAGE = "Product with ID invalid-product-1 not found.";
 
     @Mock
     private ProductClient productClient;
 
     @InjectMocks
-    private ProductService productService;
+    private GetProductByIdUseCase productService;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +28,7 @@ class ProductServiceUnitTest {
     }
 
     @Test
-    void getProductById_WhenProductExists_ShouldReturnProduct() {
+    void givenProductById_WhenProductExists_ThenReturnProduct() {
         String productId = "product-21";
         ProductDTO mockProduct = ProductDTO.builder()
                 .id(productId)
@@ -41,7 +38,7 @@ class ProductServiceUnitTest {
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);
 
-        ProductDTO product = productService.getProductById(productId);
+        ProductDTO product = productService.execute(productId);
 
         assertNotNull(product);
         assertEquals(productId, product.getId());
@@ -51,9 +48,9 @@ class ProductServiceUnitTest {
         verify(productClient, times(1)).getProductById(productId);
     }
 
-    @ParameterizedTest
-    @MethodSource("provideProductIds")
-    void getProductById_WhenProductDoesNotExist_ShouldThrowProductNotFoundException(String productId, String expectedMessage) {
+    @Test
+    void givenProductById_WhenProductDoesNotExist_ThenThrowProductNotFoundException() {
+        String productId = "invalid-product-1";
         ProductDTO mockProduct = ProductDTO.builder()
                 .id("unknown")
                 .name("Unknown Product")
@@ -62,17 +59,9 @@ class ProductServiceUnitTest {
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);
 
-        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> productService.getProductById(productId));
-        assertEquals(expectedMessage, exception.getMessage());
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> productService.execute(productId));
+        assertEquals(PRODUCT_NOT_FOUND_MESSAGE, exception.getMessage());
 
         verify(productClient, times(1)).getProductById(productId);
-    }
-
-    private static Stream<Arguments> provideProductIds() {
-        return Stream.of(
-                Arguments.of("invalid-product-1", "Product with ID invalid-product-1 not found."),
-                Arguments.of("invalid-product-2", "Product with ID invalid-product-2 not found."),
-                Arguments.of("invalid-product-3", "Product with ID invalid-product-3 not found.")
-        );
     }
 }

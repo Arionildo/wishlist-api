@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ProductClientFallbackUnitTest {
+class ProductClientFallbackTest {
 
     private final ProductClientFallback productClientFallback = new ProductClientFallback();
 
     @Test
-    void getProductById_WhenProductExists_ShouldReturnProduct() {
+    void givenProductById_WhenProductExists_ThenReturnProduct() {
         String productId = "product-5";
         ProductDTO product = productClientFallback.getProductById(productId);
 
@@ -21,7 +21,7 @@ class ProductClientFallbackUnitTest {
     }
 
     @Test
-    void getProductById_WhenProductDoesNotExist_ShouldReturnUnknownProduct() {
+    void givenProductById_WhenProductDoesNotExist_ThenReturnUnknownProduct() {
         String productId = "invalid-product";
         ProductDTO product = productClientFallback.getProductById(productId);
 
