@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Component
-@Primary
 public class ProductClientFallback implements ProductClient {
 
     private final List<ProductDTO> products;
