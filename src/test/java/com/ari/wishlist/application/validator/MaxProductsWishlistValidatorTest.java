@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,12 @@ class MaxProductsWishlistValidatorTest {
     @Test
     void givenValidWishlistAndProduct_whenValidate_thenDoesNotThrow() {
         String productId = "product-1";
-        Product product = new Product(productId, "Product 1", 100.0);
+        BigDecimal price = BigDecimal.valueOf(100.0);
+        Product product = Product.builder()
+                .productId(productId)
+                .name("Product 1")
+                .price(price)
+                .build();
         List<Product> products = new ArrayList<>();
 
         Wishlist wishlist = Wishlist.builder()
@@ -56,10 +62,25 @@ class MaxProductsWishlistValidatorTest {
     @Test
     void givenWishlistExceedsMaxProducts_whenValidate_thenThrowsWishlistLimitExceededException() {
         String productId = "product-1";
-        Product product = new Product(productId, "Product 1", 100.0);
+        BigDecimal priceA = BigDecimal.valueOf(100.0);
+        BigDecimal priceB = BigDecimal.valueOf(150.0);
+        BigDecimal priceC = BigDecimal.valueOf(200.0);
+        Product product = Product.builder()
+                .productId(productId)
+                .name("Product 1")
+                .price(priceA)
+                .build();
         List<Product> products = List.of(
-                new Product("product-2", "Product 2", 150.0),
-                new Product("product-3", "Product 3", 200.0)
+                Product.builder()
+                        .productId("product-2")
+                        .name("Product 2")
+                        .price(priceB)
+                        .build(),
+                Product.builder()
+                        .productId("product-3")
+                        .name("Product 3")
+                        .price(priceC)
+                        .build()
         );
 
         Wishlist wishlist = Wishlist.builder()
@@ -78,7 +99,12 @@ class MaxProductsWishlistValidatorTest {
     @Test
     void givenProductAlreadyInWishlist_whenValidate_thenThrowsProductAlreadyInWishlistException() {
         String productId = "product-1";
-        Product product = new Product(productId, "Product 1", 100.0);
+        BigDecimal price = BigDecimal.valueOf(100.0);
+        Product product = Product.builder()
+                .productId(productId)
+                .name("Product 1")
+                .price(price)
+                .build();
         List<Product> products = List.of(product);
 
         Wishlist wishlist = Wishlist.builder()

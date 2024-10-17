@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,12 @@ class AddProductToWishlistUseCaseTest {
     void givenValidCustomerIdAndProductId_whenExecute_thenAddsProductToWishlist() {
         String customerId = "customer-1";
         String productId = "product-1";
-        ProductDTO productDTO = new ProductDTO(productId, "Product 1", 100.0);
+        BigDecimal price = BigDecimal.valueOf(100.0);
+        ProductDTO productDTO = ProductDTO.builder()
+                .id(productId)
+                .name("Product 1")
+                .price(price)
+                .build();
         Product product = ProductMapper.toDomain(productDTO);
         Wishlist wishlist = Wishlist.builder().customerId(customerId).products(new ArrayList<>()).build();
 
@@ -66,7 +72,12 @@ class AddProductToWishlistUseCaseTest {
     void givenNewCustomerId_whenExecute_thenCreatesNewWishlist() {
         String customerId = "customer-2";
         String productId = "product-2";
-        ProductDTO productDTO = new ProductDTO(productId, "Product 2", 150.0);
+        BigDecimal price = BigDecimal.valueOf(150.0);
+        ProductDTO productDTO = ProductDTO.builder()
+                .id(productId)
+                .name("Product 2")
+                .price(price)
+                .build();
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
@@ -99,7 +110,12 @@ class AddProductToWishlistUseCaseTest {
     void givenCustomerId_whenProductAlreadyExistsInWishlist_thenThrowsException() {
         String customerId = "customer-1";
         String productId = "product-1";
-        ProductDTO productDTO = new ProductDTO(productId, "Product 1", 100.0);
+        BigDecimal price = BigDecimal.valueOf(100.0);
+        ProductDTO productDTO = ProductDTO.builder()
+                .id(productId)
+                .name("Product 1")
+                .price(price)
+                .build();
         Product product = ProductMapper.toDomain(productDTO);
 
         Wishlist wishlist = Wishlist.builder()
@@ -125,11 +141,22 @@ class AddProductToWishlistUseCaseTest {
     void givenCustomerId_whenWishlistIsFull_thenThrowsException() {
         String customerId = "customer-5";
         String productId = "product-1";
-        ProductDTO productDTO = new ProductDTO(productId, "Product 1", 250.0);
+        BigDecimal priceA = BigDecimal.valueOf(250.0);
+        BigDecimal priceB = BigDecimal.valueOf(300.0);
+        ProductDTO productDTO = ProductDTO.builder()
+                .id(productId)
+                .name("Product 1")
+                .price(priceA)
+                .build();
+        Product product = Product.builder()
+                .productId("existing-product")
+                .name("Existing Product")
+                .price(priceB)
+                .build();
 
         Wishlist wishlist = Wishlist.builder()
                 .customerId(customerId)
-                .products(new ArrayList<>(List.of(new Product("existing-product", "Existing Product", 300.0))))
+                .products(List.of(product))
                 .build();
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);

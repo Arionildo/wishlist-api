@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -30,10 +32,11 @@ class GetProductByIdUseCaseTest {
     @Test
     void givenProductById_WhenProductExists_ThenReturnProduct() {
         String productId = "product-21";
+        BigDecimal price = BigDecimal.valueOf(100.0);
         ProductDTO mockProduct = ProductDTO.builder()
                 .id(productId)
                 .name("Test Product")
-                .price(100.0)
+                .price(price)
                 .build();
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);
@@ -43,7 +46,7 @@ class GetProductByIdUseCaseTest {
         assertNotNull(product);
         assertEquals(productId, product.getId());
         assertEquals("Test Product", product.getName());
-        assertEquals(100.0, product.getPrice());
+        assertEquals(price, product.getPrice());
 
         verify(productClient, times(1)).getProductById(productId);
     }
@@ -51,10 +54,11 @@ class GetProductByIdUseCaseTest {
     @Test
     void givenProductById_WhenProductDoesNotExist_ThenThrowProductNotFoundException() {
         String productId = "invalid-product-1";
+        BigDecimal price = BigDecimal.ZERO;
         ProductDTO mockProduct = ProductDTO.builder()
                 .id("unknown")
                 .name("Unknown Product")
-                .price(0.0)
+                .price(price)
                 .build();
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,8 +16,18 @@ class WishlistMapperTest {
 
     @Test
     void givenValidWishlist_whenToDTO_thenReturnsWishlistDTO() {
-        Product product1 = new Product("product-1", "Product 1", 100.0);
-        Product product2 = new Product("product-2", "Product 2", 150.0);
+        BigDecimal priceA = BigDecimal.valueOf(100.0);
+        BigDecimal priceB = BigDecimal.valueOf(150.0);
+        Product product1 = Product.builder()
+                .productId("product-1")
+                .name("Product 1")
+                .price(priceA)
+                .build();
+        Product product2 = Product.builder()
+                .productId("product-2")
+                .name("Product 2")
+                .price(priceB)
+                .build();
         Wishlist wishlist = Wishlist.builder()
                 .id("wishlist-1")
                 .customerId("customer-1")

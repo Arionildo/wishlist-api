@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,12 @@ class HasProductInWishlistUseCaseTest {
     void givenValidCustomerIdAndProductId_whenProductExistsInWishlist_thenReturnsTrue() {
         String customerId = "customer-1";
         String productId = "product-1";
-        Product product = new Product(productId, "Product 1", 100.0);
+        BigDecimal price = BigDecimal.valueOf(100.0);
+        Product product = Product.builder()
+                .productId(productId)
+                .name("Product 1")
+                .price(price)
+                .build();
         Wishlist wishlist = Wishlist.builder()
                 .customerId(customerId)
                 .products(List.of(product))
@@ -49,7 +55,12 @@ class HasProductInWishlistUseCaseTest {
     void givenValidCustomerIdAndProductId_whenProductDoesNotExistInWishlist_thenReturnsFalse() {
         String customerId = "customer-2";
         String productId = "product-2";
-        Product product = new Product("product-1", "Product 1", 150.0);
+        BigDecimal price = BigDecimal.valueOf(150.0);
+        Product product = Product.builder()
+                .productId("product-1")
+                .name("Product 1")
+                .price(price)
+                .build();
         Wishlist wishlist = Wishlist.builder()
                 .customerId(customerId)
                 .products(List.of(product))
