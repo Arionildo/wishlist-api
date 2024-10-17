@@ -94,4 +94,24 @@ class RemoveProductFromWishlistUseCaseTest {
         verify(wishlistRepository).findByCustomerId(customerId);
         verify(wishlistRepository, never()).save(any());
     }
+
+    @Test
+    void givenValidCustomerId_whenRemovingProductFromEmptyWishlist_thenThrowsProductNotInWishlistException() {
+        String customerId = "customer-1";
+        String productId = "product-3";
+
+        Wishlist wishlist = Wishlist.builder()
+                .customerId(customerId)
+                .products(new ArrayList<>())
+                .build();
+
+        when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
+
+        ProductNotInWishlistException exception = assertThrows(ProductNotInWishlistException.class,
+                () -> removeProductFromWishlistUseCase.execute(customerId, productId));
+
+        assertEquals("Product not found in wishlist", exception.getMessage());
+        verify(wishlistRepository).findByCustomerId(customerId);
+        verify(wishlistRepository, never()).save(any());
+    }
 }

@@ -40,23 +40,16 @@ public class WishlistController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product added successfully."),
             @ApiResponse(responseCode = "400", description = "Bad request due to business rules."),
-            @ApiResponse(responseCode = "404", description = "Product not found or wishlist not found."),
+            @ApiResponse(responseCode = "404", description = "Product not found."),
             @ApiResponse(responseCode = "500", description = "Internal server error.")
     })
     @PostMapping("/{customerId}/add-product/{productId}")
     public ResponseEntity<ResponseDTO<WishlistDTO>> addProductToWishlist(@PathVariable String customerId, @PathVariable String productId) {
-        try {
-            var wishlistDTO = WishlistMapper.toDTO(addProductToWishlistUseCase.execute(customerId, productId));
-            return ResponseEntity.ok(ResponseDTO.<WishlistDTO>builder()
-                    .message("Product added successfully")
-                    .data(wishlistDTO)
-                    .build());
-        } catch (Exception exception) {
-            return ResponseEntity.badRequest().body(ResponseDTO.<WishlistDTO>builder()
-                    .message(exception.getMessage())
-                    .data(null)
-                    .build());
-        }
+        var wishlistDTO = WishlistMapper.toDTO(addProductToWishlistUseCase.execute(customerId, productId));
+        return ResponseEntity.ok(ResponseDTO.<WishlistDTO>builder()
+                .message("Product added successfully")
+                .data(wishlistDTO)
+                .build());
     }
 
     @Operation(summary = "Remove a product from the wishlist",
@@ -69,18 +62,11 @@ public class WishlistController {
     })
     @DeleteMapping("/{customerId}/remove-product/{productId}")
     public ResponseEntity<ResponseDTO<WishlistDTO>> removeProductFromWishlist(@PathVariable String customerId, @PathVariable String productId) {
-        try {
-            var wishlistDTO = WishlistMapper.toDTO(removeProductFromWishlistUseCase.execute(customerId, productId));
-            return ResponseEntity.ok(ResponseDTO.<WishlistDTO>builder()
-                    .message("Product removed successfully")
-                    .data(wishlistDTO)
-                    .build());
-        } catch (Exception exception) {
-            return ResponseEntity.badRequest().body(ResponseDTO.<WishlistDTO>builder()
-                    .message(exception.getMessage())
-                    .data(null)
-                    .build());
-        }
+        var wishlistDTO = WishlistMapper.toDTO(removeProductFromWishlistUseCase.execute(customerId, productId));
+        return ResponseEntity.ok(ResponseDTO.<WishlistDTO>builder()
+                .message("Product removed successfully")
+                .data(wishlistDTO)
+                .build());
     }
 
     @Operation(summary = "Get all products from the wishlist",
@@ -93,10 +79,6 @@ public class WishlistController {
     @GetMapping("/{customerId}")
     public ResponseEntity<ResponseDTO<List<ProductDTO>>> getProductsFromWishlist(@PathVariable String customerId) {
         var productDTOList = getAllProductsFromWishlistUseCase.execute(customerId);
-
-        if (productDTOList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
 
         return ResponseEntity.ok(ResponseDTO.<List<ProductDTO>>builder()
                 .message("Products retrieved successfully")
@@ -114,8 +96,11 @@ public class WishlistController {
     @GetMapping("/{customerId}/has-product/{productId}")
     public ResponseEntity<ResponseDTO<Boolean>> hasProductInWishlist(@PathVariable String customerId, @PathVariable String productId) {
         var hasProduct = hasProductInWishlistUseCase.execute(customerId, productId);
+
+        String message = hasProduct ? "Product is in the customer's wishlist" : "Product is not in the customer's wishlist";
+
         return ResponseEntity.ok(ResponseDTO.<Boolean>builder()
-                .message("Product is in the customer wishlist")
+                .message(message)
                 .data(hasProduct)
                 .build());
     }

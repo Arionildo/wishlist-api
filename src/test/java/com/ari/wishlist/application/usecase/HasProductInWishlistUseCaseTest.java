@@ -1,6 +1,7 @@
 package com.ari.wishlist.application.usecase;
 
 import com.ari.wishlist.domain.exception.ProductNotInWishlistException;
+import com.ari.wishlist.domain.exception.WishlistNotFoundException;
 import com.ari.wishlist.domain.model.Product;
 import com.ari.wishlist.domain.model.Wishlist;
 import com.ari.wishlist.domain.repository.WishlistRepository;
@@ -81,7 +82,7 @@ class HasProductInWishlistUseCaseTest {
 
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(ProductNotInWishlistException.class,
+        Exception exception = assertThrows(WishlistNotFoundException.class,
                 () -> hasProductInWishlistUseCase.execute(customerId, productId));
 
         assertEquals(WISHLIST_NOT_FOUND_MESSAGE + customerId, exception.getMessage());

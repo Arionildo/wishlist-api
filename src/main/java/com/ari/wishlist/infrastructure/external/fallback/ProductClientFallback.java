@@ -2,7 +2,6 @@ package com.ari.wishlist.infrastructure.external.fallback;
 
 import com.ari.wishlist.application.dto.ProductDTO;
 import com.ari.wishlist.infrastructure.external.ProductClient;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface WishlistRepository extends MongoRepository<Wishlist, String> {
     Optional<Wishlist> findByCustomerId(String customerId);
     void deleteByCustomerId(String customerId);
+    boolean existsByCustomerId(String customerId);
 }

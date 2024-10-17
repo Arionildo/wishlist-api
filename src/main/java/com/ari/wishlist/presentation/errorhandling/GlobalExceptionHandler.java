@@ -1,12 +1,10 @@
 package com.ari.wishlist.presentation.errorhandling;
 
+import com.ari.wishlist.application.dto.ResponseDTO;
 import com.ari.wishlist.application.exception.ProductMappingException;
 import com.ari.wishlist.application.exception.WishlistMappingException;
-import com.ari.wishlist.domain.exception.WishlistNotFoundException;
+import com.ari.wishlist.domain.exception.*;
 import com.ari.wishlist.infrastructure.external.exception.ProductNotFoundException;
-import com.ari.wishlist.domain.exception.WishlistLimitExceededException;
-import com.ari.wishlist.domain.exception.ProductAlreadyInWishlistException;
-import com.ari.wishlist.domain.exception.ProductNotInWishlistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,10 +17,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {
             ProductNotFoundException.class,
             WishlistNotFoundException.class,
-            UsernameNotFoundException.class
+            UsernameNotFoundException.class,
+            EmptyWishlistException.class
     })
-    public ResponseEntity<String> handleNotFoundException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    public ResponseEntity<ResponseDTO<String>> handleNotFoundException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ResponseDTO.<String>builder()
+                        .message(exception.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 
     @ExceptionHandler(value = {
@@ -32,12 +36,22 @@ public class GlobalExceptionHandler {
             ProductMappingException.class,
             WishlistMappingException.class
     })
-    public ResponseEntity<String> handleBadRequestException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+    public ResponseEntity<ResponseDTO<String>> handleBadRequestException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ResponseDTO.<String>builder()
+                        .message(exception.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneralException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + exception.getMessage());
+    public ResponseEntity<ResponseDTO<String>> handleGeneralException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ResponseDTO.<String>builder()
+                        .message("An unexpected error occurred: " + exception.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 }

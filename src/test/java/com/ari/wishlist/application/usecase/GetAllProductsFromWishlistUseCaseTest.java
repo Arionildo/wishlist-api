@@ -1,6 +1,7 @@
 package com.ari.wishlist.application.usecase;
 
 import com.ari.wishlist.application.dto.ProductDTO;
+import com.ari.wishlist.domain.exception.EmptyWishlistException;
 import com.ari.wishlist.domain.exception.WishlistNotFoundException;
 import com.ari.wishlist.domain.model.Product;
 import com.ari.wishlist.domain.model.Wishlist;
@@ -64,6 +65,23 @@ class GetAllProductsFromWishlistUseCaseTest {
                 () -> getAllProductsFromWishlistUseCase.execute(customerId));
 
         assertEquals(WISHLIST_NOT_FOUND_MESSAGE + customerId, exception.getMessage());
+        verify(wishlistRepository).findByCustomerId(customerId);
+    }
+
+    @Test
+    void givenEmptyWishlist_whenExecute_thenThrowsException() {
+        String customerId = "customer-2";
+        Wishlist wishlist = Wishlist.builder()
+                .customerId(customerId)
+                .products(List.of())
+                .build();
+
+        when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
+
+        Exception exception = assertThrows(EmptyWishlistException.class,
+                () -> getAllProductsFromWishlistUseCase.execute(customerId));
+
+        assertEquals("Wishlist is empty for customer ID: " + customerId, exception.getMessage());
         verify(wishlistRepository).findByCustomerId(customerId);
     }
 }
