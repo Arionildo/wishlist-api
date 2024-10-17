@@ -9,6 +9,7 @@ import com.ari.wishlist.domain.exception.ProductAlreadyInWishlistException;
 import com.ari.wishlist.domain.exception.ProductNotInWishlistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,7 +18,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {
             ProductNotFoundException.class,
-            WishlistNotFoundException.class
+            WishlistNotFoundException.class,
+            UsernameNotFoundException.class
     })
     public ResponseEntity<String> handleNotFoundException(Exception exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());

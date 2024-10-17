@@ -11,7 +11,7 @@ public class ProductMapper {
 
     public static Product toDomain(ProductDTO productDTO) {
         if (productDTO == null) {
-            throw new ProductMappingException("ProductDTO cannot be null");
+            throw new ProductMappingException("DTO cannot be null");
         }
         return Product.builder()
                 .productId(productDTO.getId())

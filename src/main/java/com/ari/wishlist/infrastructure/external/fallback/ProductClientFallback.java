@@ -5,6 +5,7 @@ import com.ari.wishlist.infrastructure.external.ProductClient;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -19,7 +20,7 @@ public class ProductClientFallback implements ProductClient {
                 .mapToObj(i -> ProductDTO.builder()
                         .id("product-" + i)
                         .name("Product " + i)
-                        .price(100.0 + i * 2)
+                        .price(BigDecimal.valueOf(100.0 + i * 2))
                         .build())
                 .toList();
     }
