@@ -11,6 +11,8 @@ Esta é uma API REST para gerenciamento de listas de desejos (**Wishlist**) de e
 - Limitar a quantidade de produtos na wishlist (máximo de 20)
 - Segurança configurada com autenticação básica (Basic Auth)
 
+**Usuário e senha para testar a API:** `admin` / `admin`
+
 ## Tecnologias Utilizadas
 
 - **Java 17**
@@ -37,18 +39,20 @@ Se você tem o **MongoDB** instalado localmente, pode iniciar o projeto com os s
 
 1. Clone o repositório:
 
-   ```bash
-   git clone https://github.com/Arionildo/wishlist-api.git
-   cd wishlist-api
+    ```bash
+    git clone https://github.com/Arionildo/wishlist-api.git
+    cd wishlist-api
+    ```
 
-2. Configure o MongoDB no arquivo application.properties.
+2. Configure o MongoDB no arquivo `application.properties`.
 
 3. Execute a aplicação com o Gradle:
 
     ```bash
     ./gradlew bootRun
+    ```
 
-4. A API estará disponível em: http://localhost:8080/api/v1/wishlist.
+4. A API estará disponível em: [http://localhost:8080/api/v1/wishlist](http://localhost:8080/api/v1/wishlist).
 
 ### 2. Rodando com Docker
 
@@ -60,15 +64,14 @@ Caso prefira usar Docker para executar o MongoDB e a aplicação, siga os passos
 
     ```bash
     docker-compose up --build
+    ```
 
-3. A aplicação estará rodando em http://localhost:8080 e o MongoDB no container.
-
+3. A aplicação estará rodando em [http://localhost:8080](http://localhost:8080) e o MongoDB no container.
 
 ## Documentação da API
 
 A documentação da API pode ser acessada diretamente no Swagger após a execução, em:
-http://localhost:8080/swagger-ui.html
-
+[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ## Endpoints Principais
 
@@ -78,10 +81,9 @@ http://localhost:8080/swagger-ui.html
 - **GET** [`/api/v1/wishlist/{customerId}/has-product/{productId}`](http://localhost:8080/api/v1/wishlist/{customerId}/has-product/{productId}) - Verifica se um produto está na wishlist do cliente
 - **DELETE** [`/api/v1/wishlist/{customerId}`](http://localhost:8080/api/v1/wishlist/{customerId}) - Deleta a wishlist do cliente
 
-
 ## Testes
 
 A aplicação possui cobertura completa de testes de unidade e integração, utilizando o JUnit 5. Para rodar os testes:
 
 ```bash
-    ./gradlew test
+./gradlew test
