@@ -2,27 +2,23 @@ package com.ari.wishlist.application.usecase;
 
 import com.ari.wishlist.domain.exception.WishlistNotFoundException;
 import com.ari.wishlist.domain.repository.WishlistRepository;
+import com.ari.wishlist.shared.config.UnitTestConfig;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class DeleteWishlistUseCaseTest {
-
-    @Mock
-    WishlistRepository wishlistRepository;
+class DeleteWishlistUseCaseTest extends UnitTestConfig {
 
     @InjectMocks
     DeleteWishlistUseCase deleteWishlistUseCase;
 
     @Test
     void givenExistingWishlist_whenExecute_thenDeletesWishlist() {
-        String customerId = "customer-1";
+        String customerId = UnitTestData.CUSTOMER_ID_1;
 
         when(wishlistRepository.existsByCustomerId(customerId)).thenReturn(true);
 
@@ -33,7 +29,7 @@ class DeleteWishlistUseCaseTest {
 
     @Test
     void givenNonExistentWishlist_whenExecute_thenThrowsWishlistNotFoundException() {
-        String customerId = "customer-1";
+        String customerId = UnitTestData.CUSTOMER_ID_1;
 
         when(wishlistRepository.existsByCustomerId(customerId)).thenReturn(false);
 

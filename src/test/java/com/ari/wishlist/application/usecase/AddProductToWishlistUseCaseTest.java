@@ -3,17 +3,16 @@ package com.ari.wishlist.application.usecase;
 import com.ari.wishlist.application.dto.ProductDTO;
 import com.ari.wishlist.application.mapper.ProductMapper;
 import com.ari.wishlist.application.validator.WishlistValidator;
-import com.ari.wishlist.domain.exception.ProductNotInWishlistException;
 import com.ari.wishlist.domain.exception.ProductAlreadyInWishlistException;
+import com.ari.wishlist.domain.exception.ProductNotInWishlistException;
 import com.ari.wishlist.domain.exception.WishlistLimitExceededException;
 import com.ari.wishlist.domain.model.Product;
 import com.ari.wishlist.domain.model.Wishlist;
-import com.ari.wishlist.domain.repository.WishlistRepository;
+import com.ari.wishlist.shared.config.UnitTestConfig;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,15 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class AddProductToWishlistUseCaseTest {
-
-    private static final String PRODUCT_NOT_FOUND_MESSAGE = "Product not found";
-    private static final String ALREADY_IN_WISHLIST_MESSAGE = "Product is already in the wishlist";
-    private static final String WISHLIST_FULL_MESSAGE = "Wishlist cannot contain more than 1 products";
-
-    @Mock
-    WishlistRepository wishlistRepository;
+class AddProductToWishlistUseCaseTest extends UnitTestConfig {
 
     @Mock
     WishlistValidator wishlistValidator;
@@ -44,16 +35,12 @@ class AddProductToWishlistUseCaseTest {
 
     @Test
     void givenValidCustomerIdAndProductId_whenExecute_thenAddsProductToWishlist() {
-        String customerId = "customer-1";
-        String productId = "product-1";
+        String customerId = UnitTestData.CUSTOMER_ID_1;
+        String productId = UnitTestData.PRODUCT_ID_1;
         BigDecimal price = BigDecimal.valueOf(100.0);
-        ProductDTO productDTO = ProductDTO.builder()
-                .id(productId)
-                .name("Product 1")
-                .price(price)
-                .build();
+        ProductDTO productDTO = UnitTestData.createProductDTO(productId, "Product 1", price);
         Product product = ProductMapper.toDomain(productDTO);
-        Wishlist wishlist = Wishlist.builder().customerId(customerId).products(new ArrayList<>()).build();
+        Wishlist wishlist = UnitTestData.createWishlist(customerId, new ArrayList<>());
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
@@ -70,14 +57,10 @@ class AddProductToWishlistUseCaseTest {
 
     @Test
     void givenNewCustomerId_whenExecute_thenCreatesNewWishlist() {
-        String customerId = "customer-2";
-        String productId = "product-2";
+        String customerId = UnitTestData.CUSTOMER_ID_2;
+        String productId = UnitTestData.PRODUCT_ID_2;
         BigDecimal price = BigDecimal.valueOf(150.0);
-        ProductDTO productDTO = ProductDTO.builder()
-                .id(productId)
-                .name("Product 2")
-                .price(price)
-                .build();
+        ProductDTO productDTO = UnitTestData.createProductDTO(productId, "Product 2", price);
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
@@ -94,45 +77,37 @@ class AddProductToWishlistUseCaseTest {
 
     @Test
     void givenInvalidProductId_whenExecute_thenThrowsException() {
-        String customerId = "customer-3";
-        String productId = "invalid-product";
+        String customerId = UnitTestData.CUSTOMER_ID_3;
+        String productId = UnitTestData.INVALID_PRODUCT_ID;
 
-        when(getProductByIdUseCase.execute(productId)).thenThrow(new ProductNotInWishlistException(PRODUCT_NOT_FOUND_MESSAGE));
+        when(getProductByIdUseCase.execute(productId)).thenThrow(new ProductNotInWishlistException(UnitTestData.PRODUCT_NOT_FOUND_MESSAGE));
 
         Exception exception = assertThrows(ProductNotInWishlistException.class,
                 () -> addProductToWishlistUseCase.execute(customerId, productId));
 
-        assertEquals(PRODUCT_NOT_FOUND_MESSAGE, exception.getMessage());
+        assertEquals(UnitTestData.PRODUCT_NOT_FOUND_MESSAGE, exception.getMessage());
         verify(wishlistRepository, never()).save(any());
     }
 
     @Test
     void givenCustomerId_whenProductAlreadyExistsInWishlist_thenThrowsException() {
-        String customerId = "customer-1";
-        String productId = "product-1";
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        ProductDTO productDTO = ProductDTO.builder()
-                .id(productId)
-                .name("Product 1")
-                .price(price)
-                .build();
+        String customerId = UnitTestData.CUSTOMER_ID_1;
+        String productId = UnitTestData.PRODUCT_ID_1;
+        ProductDTO productDTO = UnitTestData.createProductDTO(productId, "Product 1", BigDecimal.valueOf(100.0));
         Product product = ProductMapper.toDomain(productDTO);
 
-        Wishlist wishlist = Wishlist.builder()
-                .customerId(customerId)
-                .products(List.of(product))
-                .build();
+        Wishlist wishlist = UnitTestData.createWishlist(customerId, List.of(product));
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
 
-        doThrow(new ProductAlreadyInWishlistException(ALREADY_IN_WISHLIST_MESSAGE))
+        doThrow(new ProductAlreadyInWishlistException(UnitTestData.ALREADY_IN_WISHLIST_MESSAGE))
                 .when(wishlistValidator).validate(any(), any());
 
         Exception exception = assertThrows(ProductAlreadyInWishlistException.class,
                 () -> addProductToWishlistUseCase.execute(customerId, productId));
 
-        assertEquals(ALREADY_IN_WISHLIST_MESSAGE, exception.getMessage());
+        assertEquals(UnitTestData.ALREADY_IN_WISHLIST_MESSAGE, exception.getMessage());
         verify(wishlistValidator).validate(wishlist, product);
         verify(wishlistRepository, never()).save(any());
     }
@@ -140,35 +115,24 @@ class AddProductToWishlistUseCaseTest {
     @Test
     void givenCustomerId_whenWishlistIsFull_thenThrowsException() {
         String customerId = "customer-5";
-        String productId = "product-1";
+        String productId = UnitTestData.PRODUCT_ID_1;
         BigDecimal priceA = BigDecimal.valueOf(250.0);
         BigDecimal priceB = BigDecimal.valueOf(300.0);
-        ProductDTO productDTO = ProductDTO.builder()
-                .id(productId)
-                .name("Product 1")
-                .price(priceA)
-                .build();
-        Product product = Product.builder()
-                .productId("existing-product")
-                .name("Existing Product")
-                .price(priceB)
-                .build();
+        ProductDTO productDTO = UnitTestData.createProductDTO(productId, "Product 1", priceA);
+        Product product = UnitTestData.createProduct("existing-product", "Existing Product", priceB);
 
-        Wishlist wishlist = Wishlist.builder()
-                .customerId(customerId)
-                .products(List.of(product))
-                .build();
+        Wishlist wishlist = UnitTestData.createWishlist(customerId, List.of(product));
 
         when(getProductByIdUseCase.execute(productId)).thenReturn(productDTO);
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
 
-        doThrow(new WishlistLimitExceededException(WISHLIST_FULL_MESSAGE))
+        doThrow(new WishlistLimitExceededException(UnitTestData.WISHLIST_FULL_MESSAGE))
                 .when(wishlistValidator).validate(any(Wishlist.class), any(Product.class));
 
         Exception exception = assertThrows(WishlistLimitExceededException.class,
                 () -> addProductToWishlistUseCase.execute(customerId, productId));
 
-        assertEquals(WISHLIST_FULL_MESSAGE, exception.getMessage());
+        assertEquals(UnitTestData.WISHLIST_FULL_MESSAGE, exception.getMessage());
         verify(wishlistRepository, never()).save(any());
     }
 }

@@ -5,6 +5,7 @@ import com.ari.wishlist.domain.exception.WishlistLimitExceededException;
 import com.ari.wishlist.domain.model.Product;
 import com.ari.wishlist.domain.model.Wishlist;
 import com.ari.wishlist.infrastructure.configuration.WishlistConfig;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,7 +31,6 @@ class MaxProductsWishlistValidatorTest {
     @InjectMocks
     MaxProductsWishlistValidator maxProductsWishlistValidator;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -38,19 +38,10 @@ class MaxProductsWishlistValidatorTest {
 
     @Test
     void givenValidWishlistAndProduct_whenValidate_thenDoesNotThrow() {
-        String productId = "product-1";
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        Product product = Product.builder()
-                .productId(productId)
-                .name("Product 1")
-                .price(price)
-                .build();
+        Product product = UnitTestData.createProduct(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
         List<Product> products = new ArrayList<>();
 
-        Wishlist wishlist = Wishlist.builder()
-                .customerId("customer-1")
-                .products(products)
-                .build();
+        Wishlist wishlist = UnitTestData.createWishlist(UnitTestData.CUSTOMER_ID_1, products);
 
         when(wishlistConfig.getMaxProducts()).thenReturn(5);
 
@@ -61,32 +52,13 @@ class MaxProductsWishlistValidatorTest {
 
     @Test
     void givenWishlistExceedsMaxProducts_whenValidate_thenThrowsWishlistLimitExceededException() {
-        String productId = "product-1";
-        BigDecimal priceA = BigDecimal.valueOf(100.0);
-        BigDecimal priceB = BigDecimal.valueOf(150.0);
-        BigDecimal priceC = BigDecimal.valueOf(200.0);
-        Product product = Product.builder()
-                .productId(productId)
-                .name("Product 1")
-                .price(priceA)
-                .build();
+        Product product = UnitTestData.createProduct(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
         List<Product> products = List.of(
-                Product.builder()
-                        .productId("product-2")
-                        .name("Product 2")
-                        .price(priceB)
-                        .build(),
-                Product.builder()
-                        .productId("product-3")
-                        .name("Product 3")
-                        .price(priceC)
-                        .build()
+                UnitTestData.createProduct(UnitTestData.PRODUCT_ID_2, "Product 2", BigDecimal.valueOf(150.0)),
+                UnitTestData.createProduct(UnitTestData.PRODUCT_ID_3, "Product 3", BigDecimal.valueOf(200.0))
         );
 
-        Wishlist wishlist = Wishlist.builder()
-                .customerId("customer-1")
-                .products(new ArrayList<>(products))
-                .build();
+        Wishlist wishlist = UnitTestData.createWishlist(UnitTestData.CUSTOMER_ID_1, new ArrayList<>(products));
 
         when(wishlistConfig.getMaxProducts()).thenReturn(2);
 
@@ -98,19 +70,10 @@ class MaxProductsWishlistValidatorTest {
 
     @Test
     void givenProductAlreadyInWishlist_whenValidate_thenThrowsProductAlreadyInWishlistException() {
-        String productId = "product-1";
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        Product product = Product.builder()
-                .productId(productId)
-                .name("Product 1")
-                .price(price)
-                .build();
+        Product product = UnitTestData.createProduct(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
         List<Product> products = List.of(product);
 
-        Wishlist wishlist = Wishlist.builder()
-                .customerId("customer-1")
-                .products(new ArrayList<>(products))
-                .build();
+        Wishlist wishlist = UnitTestData.createWishlist(UnitTestData.CUSTOMER_ID_1, new ArrayList<>(products));
 
         when(wishlistConfig.getMaxProducts()).thenReturn(5);
 

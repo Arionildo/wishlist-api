@@ -3,6 +3,7 @@ package com.ari.wishlist.application.usecase;
 import com.ari.wishlist.application.dto.ProductDTO;
 import com.ari.wishlist.infrastructure.external.ProductClient;
 import com.ari.wishlist.infrastructure.external.exception.ProductNotFoundException;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,13 +32,9 @@ class GetProductByIdUseCaseTest {
 
     @Test
     void givenProductById_WhenProductExists_ThenReturnProduct() {
-        String productId = "product-21";
+        String productId = UnitTestData.PRODUCT_ID_21;
         BigDecimal price = BigDecimal.valueOf(100.0);
-        ProductDTO mockProduct = ProductDTO.builder()
-                .id(productId)
-                .name("Test Product")
-                .price(price)
-                .build();
+        ProductDTO mockProduct = UnitTestData.createProductDTO(productId, "Test Product", price);
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);
 
@@ -55,11 +52,7 @@ class GetProductByIdUseCaseTest {
     void givenProductById_WhenProductDoesNotExist_ThenThrowProductNotFoundException() {
         String productId = "invalid-product-1";
         BigDecimal price = BigDecimal.ZERO;
-        ProductDTO mockProduct = ProductDTO.builder()
-                .id("unknown")
-                .name("Unknown Product")
-                .price(price)
-                .build();
+        ProductDTO mockProduct = UnitTestData.createProductDTO("unknown", "Unknown Product", price);
 
         when(productClient.getProductById(productId)).thenReturn(mockProduct);
 

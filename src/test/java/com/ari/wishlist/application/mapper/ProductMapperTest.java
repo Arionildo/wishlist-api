@@ -2,7 +2,7 @@ package com.ari.wishlist.application.mapper;
 
 import com.ari.wishlist.application.dto.ProductDTO;
 import com.ari.wishlist.application.exception.ProductMappingException;
-import com.ari.wishlist.domain.model.Product;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -13,19 +13,14 @@ class ProductMapperTest {
 
     @Test
     void givenValidProductDTO_whenToDomain_thenReturnsProduct() {
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        var productDTO = ProductDTO.builder()
-                .id("product-1")
-                .name("Product 1")
-                .price(price)
-                .build();
+        var productDTO = UnitTestData.createProductDTO(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
 
         var product = ProductMapper.toDomain(productDTO);
 
         assertNotNull(product);
-        assertEquals("product-1", product.getProductId());
+        assertEquals(UnitTestData.PRODUCT_ID_1, product.getProductId());
         assertEquals("Product 1", product.getName());
-        assertEquals(price, product.getPrice());
+        assertEquals(BigDecimal.valueOf(100.0), product.getPrice());
     }
 
     @Test
@@ -38,19 +33,14 @@ class ProductMapperTest {
 
     @Test
     void givenValidProduct_whenToDTO_thenReturnsProductDTO() {
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        var product = Product.builder()
-                .productId("product-1")
-                .name("Product 1")
-                .price(price)
-                .build();
+        var product = UnitTestData.createProduct(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
 
         ProductDTO productDTO = ProductMapper.toDTO(product);
 
         assertNotNull(productDTO);
-        assertEquals("product-1", productDTO.getId());
+        assertEquals(UnitTestData.PRODUCT_ID_1, productDTO.getId());
         assertEquals("Product 1", productDTO.getName());
-        assertEquals(price, productDTO.getPrice());
+        assertEquals(BigDecimal.valueOf(100.0), productDTO.getPrice());
     }
 
     @Test

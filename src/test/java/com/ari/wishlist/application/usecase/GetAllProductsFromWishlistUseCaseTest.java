@@ -5,12 +5,10 @@ import com.ari.wishlist.domain.exception.EmptyWishlistException;
 import com.ari.wishlist.domain.exception.WishlistNotFoundException;
 import com.ari.wishlist.domain.model.Product;
 import com.ari.wishlist.domain.model.Wishlist;
-import com.ari.wishlist.domain.repository.WishlistRepository;
+import com.ari.wishlist.shared.config.UnitTestConfig;
+import com.ari.wishlist.shared.data.UnitTestData;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,30 +18,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class GetAllProductsFromWishlistUseCaseTest {
+class GetAllProductsFromWishlistUseCaseTest extends UnitTestConfig {
 
     private static final String WISHLIST_NOT_FOUND_MESSAGE = "Wishlist not found for customer ID: ";
-
-    @Mock
-    WishlistRepository wishlistRepository;
+    private static final String EMPTY_WISHLIST_MESSAGE_FORMAT = "Wishlist is empty for customer ID: %s";
 
     @InjectMocks
     GetAllProductsFromWishlistUseCase getAllProductsFromWishlistUseCase;
 
     @Test
     void givenValidCustomerId_whenExecute_thenReturnsProductList() {
-        String customerId = "customer-1";
-        BigDecimal price = BigDecimal.valueOf(100.0);
-        Product product = Product.builder()
-                .productId("product-1")
-                .name("Product 1")
-                .price(price)
-                .build();
-        Wishlist wishlist = Wishlist.builder()
-                .customerId(customerId)
-                .products(List.of(product))
-                .build();
+        String customerId = UnitTestData.CUSTOMER_ID_1;
+        Product product = UnitTestData.createProduct(UnitTestData.PRODUCT_ID_1, "Product 1", BigDecimal.valueOf(100.0));
+        Wishlist wishlist = UnitTestData.createWishlist(customerId, List.of(product));
 
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
 
@@ -51,13 +38,13 @@ class GetAllProductsFromWishlistUseCaseTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("product-1", result.get(0).getId());
+        assertEquals(UnitTestData.PRODUCT_ID_1, result.get(0).getId());
         verify(wishlistRepository).findByCustomerId(customerId);
     }
 
     @Test
     void givenInvalidCustomerId_whenExecute_thenThrowsException() {
-        String customerId = "invalid-customer";
+        String customerId = UnitTestData.INVALID_CUSTOMER_ID;
 
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
 
@@ -70,18 +57,15 @@ class GetAllProductsFromWishlistUseCaseTest {
 
     @Test
     void givenEmptyWishlist_whenExecute_thenThrowsException() {
-        String customerId = "customer-2";
-        Wishlist wishlist = Wishlist.builder()
-                .customerId(customerId)
-                .products(List.of())
-                .build();
+        String customerId = UnitTestData.CUSTOMER_ID_2;
+        Wishlist wishlist = UnitTestData.createEmptyWishlist(customerId);
 
         when(wishlistRepository.findByCustomerId(customerId)).thenReturn(Optional.of(wishlist));
 
         Exception exception = assertThrows(EmptyWishlistException.class,
                 () -> getAllProductsFromWishlistUseCase.execute(customerId));
 
-        assertEquals("Wishlist is empty for customer ID: " + customerId, exception.getMessage());
+        assertEquals(String.format(EMPTY_WISHLIST_MESSAGE_FORMAT, customerId), exception.getMessage());
         verify(wishlistRepository).findByCustomerId(customerId);
     }
 }
