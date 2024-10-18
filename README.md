@@ -11,7 +11,11 @@ Esta é uma API REST para gerenciamento de listas de desejos (**Wishlist**) de e
 - Limitar a quantidade de produtos na wishlist (máximo de 20)
 - Segurança configurada com autenticação básica (Basic Auth)
 
-**Usuário e senha para testar a API:** `admin` / `admin`
+## Dicas de Uso
+
+- **Usuário e senha para testar a API:** `admin` / `admin`
+- Os códigos dos produtos aceitos na wishlist são de "product-1" a "product-30". Qualquer valor fora dessa sequência não é aceito pela API.
+- O código do usuário foi pensado para ser um CPF ou UUID, mas a API aceita qualquer string.
 
 ## Tecnologias Utilizadas
 
